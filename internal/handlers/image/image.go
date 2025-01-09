@@ -7,6 +7,7 @@ import (
 
 type ImageHandler interface {
 	HandleUploadImage(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
+	HandleGetImageUrl(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 }
 
 type ImageHandlerImpl struct {
@@ -17,5 +18,9 @@ func NewImageHandler() ImageHandler {
 }
 
 func (h *ImageHandlerImpl) HandleUploadImage(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	return utils.BuildResponse("", 200, nil)
+}
+
+func (h *ImageHandlerImpl) HandleGetImageUrl(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
 	return utils.BuildResponse("", 200, nil)
 }

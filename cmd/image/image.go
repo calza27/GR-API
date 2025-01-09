@@ -28,6 +28,8 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	switch operationName {
 	case "uploadImage":
 		handlerFunc = h.ImageHandler.HandleUploadImage
+	case "getImageUrl":
+		handlerFunc = h.ImageHandler.HandleGetImageUrl
 	default:
 		return utils.BuildResponse(fmt.Sprintf("unknown operation %s", operationName), 400, nil), nil
 	}
