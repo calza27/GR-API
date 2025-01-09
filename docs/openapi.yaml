@@ -1,7 +1,7 @@
 openapi: 3.0.0
 x-explorer-enabled: false
 info:
-  title: Recipe API
+  title: Gift Registry API
   description: "A REST interface to manage Gift Registry related operations"
   contact: {}
   version: "1.0"
