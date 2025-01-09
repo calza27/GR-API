@@ -41,11 +41,6 @@ Resources:
         AllowHeaders: "'Content-Type'"
         AllowOrigin: "'*'"
         MaxAge: "'600'"
-      Auth:
-        DefaultAuthorizer: CognitoAuthorizer
-        Authorizers:
-          CognitoAuthorizer:
-            UserPoolArn: !Ref CognitoUserPoolArn
 
   GiftFuncResourceBasedPolicy:
     Type: AWS::Lambda::Permission

@@ -19,7 +19,7 @@ func main() {
 	handler := Handler{
 		GiftHandler: gifts.NewGiftHandler(),
 	}
-	lambda.Start(middleware.BoundaryLogging(middleware.EnsureUserIdPresent(handler.HandleRequest)))
+	lambda.Start(middleware.BoundaryLogging(handler.HandleRequest))
 }
 
 func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -27,13 +27,13 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	var handlerFunc func(events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 	switch operationName {
 	case "addGift":
-		handlerFunc = h.GiftHandler.HandleAddGift
+		handlerFunc = middleware.EnsureUserIdPresent(h.GiftHandler.HandleAddGift)
 	case "getGift":
 		handlerFunc = h.GiftHandler.HandleGetGift
 	case "updateGift":
-		handlerFunc = h.GiftHandler.HandleUpdateGift
+		handlerFunc = middleware.EnsureUserIdPresent(h.GiftHandler.HandleUpdateGift)
 	case "deleteGift":
-		handlerFunc = h.GiftHandler.HandleRemoveGift
+		handlerFunc = middleware.EnsureUserIdPresent(h.GiftHandler.HandleRemoveGift)
 	default:
 		return utils.BuildResponse(fmt.Sprintf("unknown operation %s", operationName), 400, nil), nil
 	}

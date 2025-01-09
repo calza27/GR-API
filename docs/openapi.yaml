@@ -1,6 +1,5 @@
 openapi: 3.0.0
 x-explorer-enabled: false
-security: []
 info:
   title: Recipe API
   description: "A REST interface to manage Gift Registry related operations"
@@ -54,6 +53,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -78,6 +79,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -108,6 +111,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -139,6 +143,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -164,6 +170,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -196,6 +204,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -225,6 +234,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -261,6 +272,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -298,6 +310,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -329,6 +343,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -352,6 +368,8 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security:
+        - CognitoPool: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -380,6 +398,7 @@ paths:
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false
+      security: []
       x-amazon-apigateway-request-validator: "basic"
       x-amazon-apigateway-integration:
         httpMethod: "POST"
@@ -387,6 +406,16 @@ paths:
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/image/arn}}:live/invocations"
 components:
+  securitySchemes:
+    CognitoPool:
+      type: "apiKey"
+      name: "Authorization"
+      in: "header"
+      x-amazon-apigateway-authtype: "cognito_user_pools"
+      x-amazon-apigateway-authorizer:
+        type: "cognito_user_pools"
+        providerARNs:
+          - Fn::Sub: "{{resolve:ssm:/gift-registry/cognito/user-pool/arn}}"
   responses:
     NoContent:
       description: "No Content"

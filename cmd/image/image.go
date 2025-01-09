@@ -19,7 +19,7 @@ func main() {
 	handler := Handler{
 		ImageHandler: image.NewImageHandler(),
 	}
-	lambda.Start(middleware.BoundaryLogging(middleware.EnsureUserIdPresent(handler.HandleRequest)))
+	lambda.Start(middleware.BoundaryLogging(handler.HandleRequest))
 }
 
 func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
@@ -27,7 +27,7 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 	var handlerFunc func(events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 	switch operationName {
 	case "uploadImage":
-		handlerFunc = h.ImageHandler.HandleUploadImage
+		handlerFunc = middleware.EnsureUserIdPresent(h.ImageHandler.HandleUploadImage)
 	case "getImageUrl":
 		handlerFunc = h.ImageHandler.HandleGetImageUrl
 	default:
