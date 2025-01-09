@@ -1,0 +1,170 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: gift registry > API Processors
+
+Parameters:
+  ImagesBucketArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /gift-registry/s3/images/arn
+  GiftTableArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /gift-registry/ddb/gifts/arn
+  ListTableArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /gift-registry/ddb/lists/arn
+
+Globals:
+  Function:
+    Handler: bootstrap
+    Runtime: provided.al2
+    Timeout: 30
+    MemorySize: 128
+    AutoPublishAlias: live
+      
+Resources:
+  FunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Description: Lambda role for Gift Registry api-processors
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - lambda.amazonaws.com
+            Action:
+              - 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      Policies:
+        - PolicyName: logs-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:PutLogEvents
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                Resource:
+                  - arn:aws:logs:*:*:*
+        - PolicyName: network-access-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeNetworkInterfaces
+                  - ec2:CreateNetworkInterface
+                  - ec2:DeleteNetworkInterface
+                Resource:
+                  - '*'
+        - PolicyName: bucket-access-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:ListBucket
+                  - s3:ListBucketVersions
+                Resource:
+                  - !Ref ImagesBucketArn
+                  - !Sub '${ImagesBucketArn}/*'
+        - PolicyName: ddb-access-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:BatchGetItem
+                  - dynamodb:BatchWriteItem
+                  - dynamodb:ConditionCheckItem
+                  - dynamodb:PutItem
+                  - dynamodb:DescribeTable
+                  - dynamodb:DeleteItem
+                  - dynamodb:GetItem
+                  - dynamodb:Scan
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !Ref GiftTableArn
+                  - !Ref ListTableArn
+        - PolicyName: ssm-access-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                Resource:
+                  - "*"
+
+  GiftFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'gift-registry-processor-gift'
+      CodeUri: ../cmd/bin/gift
+      Role:
+        !GetAtt FunctionRole.Arn
+
+  GiftFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${GiftFunc}"
+      RetentionInDays: 365
+
+  GiftFuncArnParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/gift-registry/function/gift/arn'
+      Type: String
+      Value: !Sub '${GiftFunc.Arn}'
+      Description: ARN for the Gift function handler
+
+  ListFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'gift-registry-processor-list'
+      CodeUri: ../cmd/bin/list
+      Role:
+        !GetAtt FunctionRole.Arn
+
+  ListFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ListFunc}"
+      RetentionInDays: 365
+
+  ListFuncArnParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/gift-registry/function/list/arn'
+      Type: String
+      Value: !Sub '${ListFunc.Arn}'
+      Description: ARN for the List function handler
+
+  ImageFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'gift-registry-processor-image'
+      CodeUri: ../cmd/bin/image
+      Role:
+        !GetAtt FunctionRole.Arn
+
+  ImageFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${ImageFunc}"
+      RetentionInDays: 365
+
+  ImageFuncArnParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/gift-registry/function/image/arn'
+      Type: String
+      Value: !Sub '${ImageFunc.Arn}'
+      Description: ARN for the Image function handler

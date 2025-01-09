@@ -1,0 +1,429 @@
+openapi: 3.0.0
+x-explorer-enabled: false
+security: []
+info:
+  title: Recipe API
+  description: "A REST interface to manage Gift Registry related operations"
+  contact: {}
+  version: "1.0"
+servers:
+  - url: https://cxecixxpud.execute-api.ap-southeast-2.amazonaws.com/api
+    description: Gift Registry dev server
+x-amazon-apigateway-request-validators:
+  basic:
+    validateRequestBody: true
+    validateRequestParameters: true
+x-amazon-apigateway-gateway-responses:
+  BAD_REQUEST_BODY:
+    statusCode: "400"
+    responseTemplates:
+      application/json: '{ "errors": [ { "detail": "$context.error.message: $context.error.validationErrorString" } ] }'
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Cache-Control: "'no-store'"
+      gatewayresponse.header.Content-Security-Policy: "'frame-ancestors 'none''"
+      gatewayresponse.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+      gatewayresponse.header.X-FRAME-OPTIONS: "'DENY'"
+      gatewayresponse.header.X-Content-Type-Options: "'nosniff'"
+  ACCESS_DENIED:
+    statusCode: "403"
+    responseTemplates:
+      application/json: '{ "errors": [ { "detail": "Not authorized to access this resource" } ] }'
+    responseParameters:
+      gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+      gatewayresponse.header.Cache-Control: "'no-store'"
+      gatewayresponse.header.Content-Security-Policy: "'frame-ancestors 'none''"
+      gatewayresponse.header.Strict-Transport-Security: "'max-age=31536000; includeSubDomains'"
+      gatewayresponse.header.X-FRAME-OPTIONS: "'DENY'"
+      gatewayresponse.header.X-Content-Type-Options: "'nosniff'"
+paths:
+  /gift/add:
+    post:
+      summary: Add a new gift
+      description: "Add a new gift"
+      operationId: addGift
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gift"
+        required: true
+      responses:
+        "201":
+          description: "Success"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
+  /gift/get/{giftId}:
+    get:
+      summary: Get a gift
+      description: "Get a gift"
+      operationId: getGift
+      parameters:
+        - name: giftId
+          in: path
+          description: the ID of the gift to get
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/gift"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
+  /gift/update/{giftId}:
+    put:
+      summary: Update a gift
+      description: "Update a gift"
+      operationId: updateGift
+      parameters:
+        - name: giftId
+          in: path
+          description: the ID of the gift to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/gift"
+        required: true
+      responses:
+        "201":
+          description: "Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
+  /gift/remove/{giftId}:
+    delete:
+      summary: Delete a gift
+      description: "Delete a gift"
+      operationId: deleteGift
+      parameters:
+        - name: giftId
+          in: path
+          description: the ID of the gift to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: "Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
+  /list/add:
+    post:
+      summary: Add a new list
+      description: "Add a new lidts"
+      operationId: addList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/list"
+        required: true
+      responses:
+        "201":
+          description: "Success"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+  /list/get:
+    get:
+      summary: Get a list of lists
+      description: "Get a list of lists"
+      operationId: getListList
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/list"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+  /list/get/{listId}:
+    get:
+      summary: Get a list
+      description: "Get a list"
+      operationId: getList
+      parameters:
+        - name: listId
+          in: path
+          description: the ID of the list to get
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/list"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+  /list/gifts/{listId}:
+    get:
+      summary: Get gifts for a list
+      description: "Get gifts for a list"
+      operationId: getGiftList
+      parameters:
+        - name: listId
+          in: path
+          description: the ID of the list to get the gifts for
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/gift"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+  /list/update/{listId}:
+    put:
+      summary: Update a list
+      description: "Update a list"
+      operationId: updateList
+      parameters:
+        - name: listId
+          in: path
+          description: the ID of the list to update
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/list"
+        required: true
+      responses:
+        "201":
+          description: "Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+  /list/remove/{listId}:
+    delete:
+      summary: Delete a list
+      description: "Delete a list"
+      operationId: deleteList
+      parameters:
+        - name: listId
+          in: path
+          description: the ID of the list to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: "Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+  /image/upload:
+    put:
+      summary: Upload an image
+      description: "Upload an image"
+      operationId: uploadImage
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: string
+        required: true
+      responses:
+        "201":
+          description: "Success"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/image/arn}}:live/invocations"
+components:
+  responses:
+    NoContent:
+      description: "No Content"
+    BadRequest:
+      description: "Bad Request"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    NotFound:
+      description: "Not Found"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    Conflict:
+      description: "Conflict"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    Unauthorized:
+      description: "Unauthorized"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    Forbidden:
+      description: "Forbidden"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+    InternalServerError:
+      description: "Internal Server Error"
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/error"
+  schemas:
+    error:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: the HTTP status code
+          example: 400
+        message:
+          type: string
+          description: a human readable message
+          example: "An error occured during [x]"
+    list:
+      title: List
+      type: object
+      properties:
+        Uuid:
+          type: string
+        UserId:
+          type: string
+        CreatedAt:
+          type: string
+        Name:
+          type: string
+    gift:
+      title: Gift
+      type: object
+      properties:
+        Uuid:
+          type: string
+        ListId:
+          type: string
+        CreatedAt:
+          type: string
+        Title:
+          type: string
+        Description:
+          type: string
+        PlaceOfPurchase:
+          type: string
+        ImageRef:
+          type: string
+        Url:
+          type: string
+        Price:
+          type: number
+        Rank:
+          type: number
