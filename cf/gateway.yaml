@@ -2,11 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: gift registry > API Gateawy
 
-Parameters:
-  CognitoUserPoolArn:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /gift-registry/cognito/user-pool/arn
-
 Resources:
   ApiLogGroup:
     Type: AWS::Logs::LogGroup
