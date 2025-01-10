@@ -26,7 +26,7 @@ func NewImageHandler(imageRepo repositories.ImageRepository) ImageHandler {
 
 func (h *ImageHandlerImpl) HandleUploadImage(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
 	var image models.Image
-	err := utils.DecodeRequestBody(request.Body, &image)
+	err := utils.DecodeRequestBody(request, &image)
 	if err != nil {
 		fmt.Printf("Error unmarshalling request body: %w\n", err)
 		return utils.BuildResponse("Error unmarshalling request body", 400, nil)
