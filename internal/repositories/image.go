@@ -23,10 +23,10 @@ type ImageRepository interface {
 type S3ImageRepository struct {
 	s3          *s3.Client
 	bucketname  string
-	urlLifespan int64
+	urlLifespan time.Duration
 }
 
-func NewImageRepository(bucketname string, urlLifespan int64) (ImageRepository, error) {
+func NewImageRepository(bucketname string, urlLifespan time.Duration) (ImageRepository, error) {
 	s3, err := awsclient.GetS3Client()
 	if err != nil {
 		return nil, fmt.Errorf("Error when initialising connection to S3: %w", err)
@@ -69,7 +69,7 @@ func (r *S3ImageRepository) GetImageUrl(fileName string) (*string, error) {
 		Bucket: aws.String(r.bucketname),
 		Key:    aws.String(fileName),
 	}, func(opts *s3.PresignOptions) {
-		opts.Expires = time.Duration(r.urlLifespan)
+		opts.Expires = r.urlLifespan
 	})
 	if err != nil {
 		return nil, fmt.Errorf("Error when geenerating presigned URL for object: %w", err)
