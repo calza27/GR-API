@@ -26,27 +26,21 @@ func BoundaryLogging(h func(context.Context, events.APIGatewayProxyRequest) (eve
 
 func buildRequestForLog(r events.APIGatewayProxyRequest) map[string]string {
 	request := map[string]string{
-		"Resource":              r.Resource,
-		"Path":                  r.Path,
-		"HTTPMethod":            r.HTTPMethod,
-		"Referer":               r.Headers["Referer"],
-		"User-Agent":            r.Headers["User-Agent"],
-		"X-Amzn-Trace-Id":       r.Headers["X-Amzn-Trace-Id"],
-		"X-Forwarded-For":       r.Headers["X-Forwarded-For"],
-		"Authorizer.user_id":    nilInterfaceToString(r.RequestContext.Authorizer["user_id"]),
-		"PathParameters":        preparePathParams(r),
-		"QueryStringParameters": prepareQueryParams(r),
-		"Body":                  r.Body,
-		"RequestTime":           r.RequestContext.RequestTime,
+		"Resource":                    r.Resource,
+		"Path":                        r.Path,
+		"HTTPMethod":                  r.HTTPMethod,
+		"Referer":                     r.Headers["Referer"],
+		"User-Agent":                  r.Headers["User-Agent"],
+		"X-Amzn-Trace-Id":             r.Headers["X-Amzn-Trace-Id"],
+		"X-Forwarded-For":             r.Headers["X-Forwarded-For"],
+		"Authorizer":                  fmt.Sprintf("%+v", r.RequestContext.Authorizer),
+		"Authorizer.cognito:username": utils.GetUserIdFromRequest(r),
+		"PathParameters":              preparePathParams(r),
+		"QueryStringParameters":       prepareQueryParams(r),
+		"Body":                        r.Body,
+		"RequestTime":                 r.RequestContext.RequestTime,
 	}
 	return request
-}
-
-func nilInterfaceToString(i interface{}) string {
-	if i == nil {
-		return ""
-	}
-	return i.(string)
 }
 
 func buildResponseForLog(r events.APIGatewayProxyResponse) map[string]string {

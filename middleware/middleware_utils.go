@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
+	"github.com/calza27/Gift-Registry/GR-API/internal/utils"
 )
 
 type HandlerFunc func(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
@@ -25,12 +26,9 @@ func getUserIdFromAuth(request events.APIGatewayProxyRequest) (*string, error) {
 	if request.RequestContext.Authorizer == nil {
 		return nil, fmt.Errorf("err: No authorizer found in request context")
 	}
-	if _, ok := request.RequestContext.Authorizer["user_id"]; !ok {
-		return nil, fmt.Errorf("err: No user_id field found in Authorisation from Authorizer")
-	}
-	userId := request.RequestContext.Authorizer["user_id"].(string)
-	if len(userId) == 0 {
-		return nil, fmt.Errorf("err: No user_id found in Authorisation from Authorizer")
+	userId := utils.GetUserIdFromRequest(request)
+	if userId == "" {
+		return nil, fmt.Errorf("err: No cognito:username found in Authorisation from Authorizer")
 	}
 	return &userId, nil
 }

@@ -34,7 +34,7 @@ func (h *ListHandlerImpl) HandleAddList(request events.APIGatewayProxyRequest) e
 		fmt.Printf("Error unmarshalling request body: %w\n", err)
 		return utils.BuildResponse("Error unmarshalling request body", 400, nil)
 	}
-	userId := request.RequestContext.Authorizer["user_id"].(string)
+	userId := utils.GetUserIdFromRequest(request)
 	if userId == "" {
 		return utils.BuildResponse("Missing required auth parameter: user_id", 400, nil)
 	}
@@ -48,7 +48,7 @@ func (h *ListHandlerImpl) HandleAddList(request events.APIGatewayProxyRequest) e
 }
 
 func (h *ListHandlerImpl) HandleGetListList(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	userId := request.RequestContext.Authorizer["user_id"].(string)
+	userId := utils.GetUserIdFromRequest(request)
 	if userId == "" {
 		return utils.BuildResponse("Missing required auth parameter: user_id", 400, nil)
 	}
@@ -69,7 +69,7 @@ func (h *ListHandlerImpl) HandleGetListList(request events.APIGatewayProxyReques
 }
 
 func (h *ListHandlerImpl) HandleGetList(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	userId := request.RequestContext.Authorizer["user_id"].(string)
+	userId := utils.GetUserIdFromRequest(request)
 	if userId == "" {
 		return utils.BuildResponse("Missing required auth parameter: user_id", 400, nil)
 	}
@@ -95,7 +95,7 @@ func (h *ListHandlerImpl) HandleGetList(request events.APIGatewayProxyRequest) e
 }
 
 func (h *ListHandlerImpl) HandleUpdateList(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	userId := request.RequestContext.Authorizer["user_id"].(string)
+	userId := utils.GetUserIdFromRequest(request)
 	if userId == "" {
 		return utils.BuildResponse("Missing required auth parameter: user_id", 400, nil)
 	}
@@ -124,7 +124,7 @@ func (h *ListHandlerImpl) HandleUpdateList(request events.APIGatewayProxyRequest
 }
 
 func (h *ListHandlerImpl) HandleRemoveList(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	userId := request.RequestContext.Authorizer["user_id"].(string)
+	userId := utils.GetUserIdFromRequest(request)
 	if userId == "" {
 		return utils.BuildResponse("Missing required auth parameter: user_id", 400, nil)
 	}

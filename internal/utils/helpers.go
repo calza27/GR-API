@@ -8,6 +8,19 @@ import (
 	"github.com/google/uuid"
 )
 
+func GetUserIdFromRequest(request events.APIGatewayProxyRequest) string {
+	i := request.RequestContext.Authorizer["claims"]
+	if i == nil {
+		return ""
+	}
+	claimsMap := i.(map[string]interface{})
+	i = claimsMap["cognito:username"]
+	if i == nil {
+		return ""
+	}
+	return i.(string)
+}
+
 func BuildQueryString(parts []string) string {
 	if len(parts) == 0 {
 		return ""
