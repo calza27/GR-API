@@ -43,7 +43,7 @@ func NewGiftRepository(tableName, listIdIndex string) (GiftRepository, error) {
 }
 
 type GiftEntity struct {
-	Uuid            string `dynamodbav:"uuid"`
+	Id              string `dynamodbav:"id"`
 	ListId          string `dynamodbav:"listId"`
 	CreatedAt       string `dynamodbav:"createdAt"`
 	Title           string `dynamodbav:"title,omitempty"`
@@ -59,7 +59,7 @@ func (r *DynamoDbGiftRepository) CreateGift(gift models.Gift) error {
 	giftItem := convertToGiftModel(gift)
 	now := time.Now()
 	giftItem.CreatedAt = utils.DateTimeToString(now)
-	giftItem.Uuid = utils.GenerateUUID()
+	giftItem.Id = utils.GenerateUUID()
 	item, err := attributevalue.MarshalMap(giftItem)
 	if err != nil {
 		return fmt.Errorf("error when trying to convert gift data to dynamodbattribute: %w", err)
@@ -90,9 +90,9 @@ func (r *DynamoDbGiftRepository) persistGift(item map[string]types.AttributeValu
 func (r *DynamoDbGiftRepository) GetGiftById(giftId string) (models.Gift, error) {
 	params := &dynamodb.QueryInput{
 		TableName:              aws.String(r.tablename),
-		KeyConditionExpression: aws.String("uuid = :uuid"),
+		KeyConditionExpression: aws.String("id = :id"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":uuid": &types.AttributeValueMemberS{Value: giftId},
+			":id": &types.AttributeValueMemberS{Value: giftId},
 		},
 	}
 	result, err := r.db.Query(context.Background(), params)
@@ -141,7 +141,7 @@ func (r *DynamoDbGiftRepository) DeleteGift(giftId string) error {
 	params := &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.tablename),
 		Key: map[string]types.AttributeValue{
-			"uuid": &types.AttributeValueMemberS{Value: giftId},
+			"id": &types.AttributeValueMemberS{Value: giftId},
 		},
 	}
 	_, err := r.db.DeleteItem(context.Background(), params)
@@ -154,7 +154,7 @@ func (r *DynamoDbGiftRepository) DeleteGift(giftId string) error {
 func convertToGiftModel(gift models.Gift) GiftEntity {
 
 	giftItem := GiftEntity{
-		Uuid:            gift.Uuid,
+		Id:              gift.Id,
 		ListId:          gift.ListId,
 		CreatedAt:       gift.CreatedAt,
 		Title:           gift.Title,
@@ -170,7 +170,7 @@ func convertToGiftModel(gift models.Gift) GiftEntity {
 
 func convertToGift(gift GiftEntity) models.Gift {
 	return models.Gift{
-		Uuid:            gift.Uuid,
+		Id:              gift.Id,
 		ListId:          gift.ListId,
 		CreatedAt:       gift.CreatedAt,
 		Title:           gift.Title,

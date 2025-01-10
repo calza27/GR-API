@@ -106,7 +106,7 @@ func (h *GiftHandlerImpl) HandleUpdateGift(request events.APIGatewayProxyRequest
 	if giftId == "" {
 		return utils.BuildResponse("Missing required path parameter: gift_id", 400, nil)
 	}
-	if giftId != gift.Uuid {
+	if giftId != gift.Id {
 		return utils.BuildResponse("Gift ID in path does not match Gift ID in request body", 400, nil)
 	}
 	listId := request.PathParameters["list_id"]

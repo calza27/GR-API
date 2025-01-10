@@ -69,10 +69,6 @@ func (h *ListHandlerImpl) HandleGetListList(request events.APIGatewayProxyReques
 }
 
 func (h *ListHandlerImpl) HandleGetList(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
-	userId := utils.GetUserIdFromRequest(request)
-	if userId == "" {
-		return utils.BuildResponse("Missing required auth parameter: user_id", 400, nil)
-	}
 	listId := request.PathParameters["list_id"]
 	if listId == "" {
 		return utils.BuildResponse("Missing required path parameter: list_id", 400, nil)
@@ -81,9 +77,6 @@ func (h *ListHandlerImpl) HandleGetList(request events.APIGatewayProxyRequest) e
 	if err != nil {
 		fmt.Printf("Error getting list: %w\n", err)
 		return utils.BuildResponse("Error getting list", 500, nil)
-	}
-	if list.UserId != userId {
-		return utils.BuildResponse("Gift not found", 404, nil)
 	}
 
 	body, err := utils.EncodeResponseBody(list)
@@ -109,7 +102,7 @@ func (h *ListHandlerImpl) HandleUpdateList(request events.APIGatewayProxyRequest
 		fmt.Printf("Error unmarshalling request body: %w\n", err)
 		return utils.BuildResponse("Error unmarshalling request body", 400, nil)
 	}
-	if listId != list.Uuid {
+	if listId != list.Id {
 		return utils.BuildResponse("List ID in path does not match List ID in request body", 400, nil)
 	}
 	if list.UserId != userId {

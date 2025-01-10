@@ -45,10 +45,10 @@ func NewListRepository(tableName, userIdIndex, sharingIdIndex string) (ListRepos
 }
 
 type ListEntity struct {
-	Uuid      string `dynamodbav:"uuid"`
+	Id        string `dynamodbav:"id"`
 	UserId    string `dynamodbav:"userId"`
 	CreatedAt string `dynamodbav:"createdAt"`
-	Name      string `dynamodbav:"name,omitempty"`
+	Name      string `dynamodbav:"listName,omitempty"`
 	SharingId string `dynamodbav:"sharingId,omitempty"`
 }
 
@@ -56,7 +56,7 @@ func (r *DynamoDbListRepository) CreateList(list models.List) error {
 	listItem := convertToListModel(list)
 	now := time.Now()
 	listItem.CreatedAt = utils.DateTimeToString(now)
-	listItem.Uuid = utils.GenerateUUID()
+	listItem.Id = utils.GenerateUUID()
 	item, err := attributevalue.MarshalMap(listItem)
 	if err != nil {
 		return fmt.Errorf("error when trying to convert list data to dynamodbattribute: %w", err)
@@ -88,9 +88,9 @@ func (r *DynamoDbListRepository) persistList(item map[string]types.AttributeValu
 func (r *DynamoDbListRepository) GetListById(listId string) (models.List, error) {
 	params := &dynamodb.QueryInput{
 		TableName:              aws.String(r.tablename),
-		KeyConditionExpression: aws.String("uuid = :uuid"),
+		KeyConditionExpression: aws.String("id = :id"),
 		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":uuid": &types.AttributeValueMemberS{Value: listId},
+			":id": &types.AttributeValueMemberS{Value: listId},
 		},
 	}
 	result, err := r.db.Query(context.Background(), params)
@@ -155,7 +155,7 @@ func (r *DynamoDbListRepository) DeleteList(listId string) error {
 	params := &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.tablename),
 		Key: map[string]types.AttributeValue{
-			"uuid": &types.AttributeValueMemberS{Value: listId},
+			"id": &types.AttributeValueMemberS{Value: listId},
 		},
 	}
 	_, err := r.db.DeleteItem(context.Background(), params)
@@ -168,7 +168,7 @@ func (r *DynamoDbListRepository) DeleteList(listId string) error {
 func convertToListModel(list models.List) ListEntity {
 
 	listItem := ListEntity{
-		Uuid:      list.Uuid,
+		Id:        list.Id,
 		UserId:    list.UserId,
 		CreatedAt: list.CreatedAt,
 		Name:      list.Name,
@@ -179,7 +179,7 @@ func convertToListModel(list models.List) ListEntity {
 
 func convertToList(list ListEntity) models.List {
 	return models.List{
-		Uuid:      list.Uuid,
+		Id:        list.Id,
 		UserId:    list.UserId,
 		CreatedAt: list.CreatedAt,
 		Name:      list.Name,

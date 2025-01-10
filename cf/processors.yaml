@@ -80,19 +80,23 @@ Resources:
             Statement:
               - Effect: Allow
                 Action:
-                  - dynamodb:BatchGetItem
-                  - dynamodb:BatchWriteItem
-                  - dynamodb:ConditionCheckItem
                   - dynamodb:PutItem
-                  - dynamodb:DescribeTable
                   - dynamodb:DeleteItem
                   - dynamodb:GetItem
-                  - dynamodb:Scan
                   - dynamodb:Query
-                  - dynamodb:UpdateItem
                 Resource:
                   - !Ref GiftTableArn
                   - !Ref ListTableArn
+        - PolicyName: ddb-query-indexes-policy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:Query
+                Resource:
+                  - !Sub "${GiftTableArn}/index/*"
+                  - !Sub "${ListTableArn}/index/*"
         - PolicyName: ssm-access-policy
           PolicyDocument:
             Version: '2012-10-17'

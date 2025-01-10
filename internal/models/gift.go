@@ -1,7 +1,7 @@
 package models
 
 type Gift struct {
-	Uuid            string `json:"uuid"`
+	Id              string `json:"id"`
 	ListId          string `json:"list_id"`
 	CreatedAt       string `json:"created_at"`
 	Title           string `json:"title"`
