@@ -7,6 +7,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/calza27/Gift-Registry/GR-API/internal/handlers/image"
+	"github.com/calza27/Gift-Registry/GR-API/internal/repositories"
 	"github.com/calza27/Gift-Registry/GR-API/internal/utils"
 	"github.com/calza27/Gift-Registry/GR-API/middleware"
 )
@@ -16,8 +17,14 @@ type Handler struct {
 }
 
 func main() {
+	bucketName := "gift-registry-images"
+	urlLifespan := int64(60)
+	imageRepository, err := repositories.NewImageRepository(bucketName, urlLifespan)
+	if err != nil {
+		panic(err)
+	}
 	handler := Handler{
-		ImageHandler: image.NewImageHandler(),
+		ImageHandler: image.NewImageHandler(imageRepository),
 	}
 	lambda.Start(middleware.BoundaryLogging(handler.HandleRequest))
 }

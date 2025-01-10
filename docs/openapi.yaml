@@ -363,8 +363,12 @@ paths:
               $ref: "#/components/schemas/imageData"
         required: true
       responses:
-        "201":
+        "200":
           description: "Success"
+          content:
+            application/json:
+              schema:
+                type: string
         "500":
           $ref: "#/components/responses/InternalServerError"
       deprecated: false

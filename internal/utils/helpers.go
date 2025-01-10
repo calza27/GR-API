@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"encoding/json"
 	"strings"
 
 	"github.com/google/uuid"
@@ -16,4 +17,8 @@ func BuildQueryString(parts []string) string {
 func GenerateUUID() string {
 	id := uuid.New()
 	return id.String()
+}
+
+func DecodeRequestBody(body string, v interface{}) error {
+	return json.Unmarshal([]byte(body), &v)
 }
