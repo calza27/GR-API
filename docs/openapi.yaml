@@ -210,7 +210,7 @@ paths:
         httpMethod: "POST"
         type: "aws_proxy"
         uri:
-          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/list/arn}}:live/invocations"
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
     post:
       summary: Add a new gift to the given list
       description: "Add a new gift to the given list"
