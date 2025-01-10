@@ -56,7 +56,7 @@ func (r *DynamoDbListRepository) CreateList(list models.List) error {
 	listItem := convertToListModel(list)
 	now := time.Now()
 	listItem.CreatedAt = utils.DateTimeToString(now)
-
+	listItem.Uuid = utils.GenerateUUID()
 	item, err := attributevalue.MarshalMap(listItem)
 	if err != nil {
 		return fmt.Errorf("error when trying to convert list data to dynamodbattribute: %w", err)

@@ -59,7 +59,7 @@ func (r *DynamoDbGiftRepository) CreateGift(gift models.Gift) error {
 	giftItem := convertToGiftModel(gift)
 	now := time.Now()
 	giftItem.CreatedAt = utils.DateTimeToString(now)
-
+	giftItem.Uuid = utils.GenerateUUID()
 	item, err := attributevalue.MarshalMap(giftItem)
 	if err != nil {
 		return fmt.Errorf("error when trying to convert gift data to dynamodbattribute: %w", err)
