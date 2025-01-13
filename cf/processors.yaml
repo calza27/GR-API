@@ -172,3 +172,25 @@ Resources:
       Type: String
       Value: !Sub '${ImageFunc.Arn}'
       Description: ARN for the Image function handler
+
+  UserFunc:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: 'gift-registry-processor-user'
+      CodeUri: ../cmd/bin/user
+      Role:
+        !GetAtt FunctionRole.Arn
+
+  UserFuncLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub "/aws/lambda/${UserFunc}"
+      RetentionInDays: 365
+
+  UserFuncArnParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: '/gift-registry/function/user/arn'
+      Type: String
+      Value: !Sub '${UserFunc.Arn}'
+      Description: ARN for the User function handler
