@@ -45,11 +45,12 @@ func NewListRepository(tableName, userIdIndex, sharingIdIndex string) (ListRepos
 }
 
 type ListEntity struct {
-	Id        string `dynamodbav:"id"`
-	UserId    string `dynamodbav:"userId"`
-	CreatedAt string `dynamodbav:"createdAt"`
-	Name      string `dynamodbav:"listName,omitempty"`
-	SharingId string `dynamodbav:"sharingId,omitempty"`
+	Id            string `dynamodbav:"id"`
+	UserId        string `dynamodbav:"userId"`
+	CreatedAt     string `dynamodbav:"createdAt"`
+	Name          string `dynamodbav:"listName,omitempty"`
+	SharingId     string `dynamodbav:"sharingId,omitempty"`
+	ImageFileName string `dynamodbav:"imageFileName,omitempty"`
 }
 
 func (r *DynamoDbListRepository) CreateList(list models.List) error {
@@ -168,21 +169,23 @@ func (r *DynamoDbListRepository) DeleteList(listId string) error {
 func convertToListModel(list models.List) ListEntity {
 
 	listItem := ListEntity{
-		Id:        list.Id,
-		UserId:    list.UserId,
-		CreatedAt: list.CreatedAt,
-		Name:      list.Name,
-		SharingId: list.SharingId,
+		Id:            list.Id,
+		UserId:        list.UserId,
+		CreatedAt:     list.CreatedAt,
+		Name:          list.Name,
+		SharingId:     list.SharingId,
+		ImageFileName: list.ImageFileName,
 	}
 	return listItem
 }
 
 func convertToList(list ListEntity) models.List {
 	return models.List{
-		Id:        list.Id,
-		UserId:    list.UserId,
-		CreatedAt: list.CreatedAt,
-		Name:      list.Name,
-		SharingId: list.SharingId,
+		Id:            list.Id,
+		UserId:        list.UserId,
+		CreatedAt:     list.CreatedAt,
+		Name:          list.Name,
+		SharingId:     list.SharingId,
+		ImageFileName: list.ImageFileName,
 	}
 }

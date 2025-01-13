@@ -409,6 +409,71 @@ paths:
         type: "aws_proxy"
         uri:
           Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/image/arn}}:live/invocations"
+  /user/{user_id}:
+    get:
+      summary: Get the user details
+      description: "Get the user details"
+      operationId: getUser
+      parameters:
+        - name: user_id
+          in: path
+          description: the id of the user
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $erf: "#/components/schemas/user"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      security:
+        - CognitoPool: []
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/user/arn}}:live/invocations"
+    post:
+      summary: Update the user details
+      description: "Update the user details"
+      operationId: updateUser
+      parameters:
+        - name: user_id
+          in: path
+          description: the id of the user
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/user"
+        required: true
+      responses:
+        "201":
+          description: "Success"
+          content:
+            application/json:
+              schema:
+                $erf: "#/components/schemas/user"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      security:
+        - CognitoPool: []
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/user/arn}}:live/invocations"
 components:
   securitySchemes:
     CognitoPool:
@@ -485,6 +550,8 @@ components:
           type: string
         sharing_id:
           type: string
+        image_file_name:
+          type: string
     gift:
       title: Gift
       type: object
@@ -516,4 +583,16 @@ components:
         file_name:
           type: string
         file_data:
+          type: string
+    user:
+      title: User
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        email:
+          type: string
+        image_file_name:
           type: string
