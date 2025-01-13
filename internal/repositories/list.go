@@ -58,6 +58,11 @@ func (r *DynamoDbListRepository) CreateList(list models.List) error {
 	now := time.Now()
 	listItem.CreatedAt = utils.DateTimeToString(now)
 	listItem.Id = utils.GenerateUUID()
+	sharingId, err := r.uniqueSharingId()
+	if err != nil {
+		return fmt.Errorf("Error when trying to generate unique sharing id: %w", err)
+	}
+	listItem.SharingId = sharingId
 	item, err := attributevalue.MarshalMap(listItem)
 	if err != nil {
 		return fmt.Errorf("error when trying to convert list data to dynamodbattribute: %w", err)
@@ -188,4 +193,32 @@ func convertToList(list ListEntity) models.List {
 		SharingId:     list.SharingId,
 		ImageFileName: list.ImageFileName,
 	}
+}
+
+func (r *DynamoDbListRepository) uniqueSharingId() (string, error) {
+	limit := 10
+	for {
+		sharingId := generateSharingId()
+		existingList, err := r.GetListById(sharingId)
+		if err != nil {
+			return "", err
+		}
+		if existingList.Id == "" {
+			return sharingId, nil
+		}
+		limit -= 1
+		if limit == 0 {
+			return "", fmt.Errorf("Could not generate unique sharing id")
+		}
+	}
+}
+
+func generateSharingId() string {
+	length := 12
+	chars := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	sharingId := make([]byte, length)
+	for i := range sharingId {
+		sharingId[i] = chars[utils.RandomInt(0, len(chars))]
+	}
+	return string(sharingId)
 }

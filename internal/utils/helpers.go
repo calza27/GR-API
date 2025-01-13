@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"math/rand"
 	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -40,4 +41,8 @@ func DecodeRequestBody(request events.APIGatewayProxyRequest, v interface{}) err
 func EncodeResponseBody(v interface{}) (string, error) {
 	body, err := json.Marshal(v)
 	return string(body), err
+}
+
+func RandomInt(min, max int) int {
+	return min + rand.Intn(max-min)
 }
