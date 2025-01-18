@@ -58,7 +58,7 @@ func (h *ListHandlerImpl) HandleGetListList(request events.APIGatewayProxyReques
 		return utils.BuildResponse("Error getting list of gift lists", 500, nil)
 	}
 	if len(lists) == 0 {
-		return utils.BuildResponse("No lists found", 404, nil)
+		return utils.BuildResponse("[]", 200, nil)
 	}
 	body, err := utils.EncodeResponseBody(lists)
 	if err != nil {
