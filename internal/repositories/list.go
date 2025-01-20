@@ -158,13 +158,21 @@ func (r *DynamoDbListRepository) GetListsByUserId(userId string) ([]models.List,
 }
 
 func (r *DynamoDbListRepository) DeleteList(listId string) error {
+	list, err := r.GetListById(listId)
+	if err != nil {
+		return fmt.Errorf("Error when trying to verify list by id: %w", err)
+	}
+	if list.Id == "" {
+		return fmt.Errorf("No list found with id to delete: %s", listId)
+	}
 	params := &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.tablename),
 		Key: map[string]types.AttributeValue{
-			"id": &types.AttributeValueMemberS{Value: listId},
+			"id":        &types.AttributeValueMemberS{Value: list.Id},
+			"createdAt": &types.AttributeValueMemberS{Value: list.CreatedAt},
 		},
 	}
-	_, err := r.db.DeleteItem(context.Background(), params)
+	_, err = r.db.DeleteItem(context.Background(), params)
 	if err != nil {
 		return fmt.Errorf("Error when trying to delete list: %w", err)
 	}

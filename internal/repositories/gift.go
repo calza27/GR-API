@@ -138,13 +138,21 @@ func (r *DynamoDbGiftRepository) GetGiftsByListId(listId string) ([]models.Gift,
 }
 
 func (r *DynamoDbGiftRepository) DeleteGift(giftId string) error {
+	gift, err := r.GetGiftById(giftId)
+	if err != nil {
+		return fmt.Errorf("Error when trying to verify gift by id: %w", err)
+	}
+	if gift.Id == "" {
+		return fmt.Errorf("No gift found with id to delete: %s", giftId)
+	}
 	params := &dynamodb.DeleteItemInput{
 		TableName: aws.String(r.tablename),
 		Key: map[string]types.AttributeValue{
-			"id": &types.AttributeValueMemberS{Value: giftId},
+			"id":        &types.AttributeValueMemberS{Value: gift.Id},
+			"createdAt": &types.AttributeValueMemberS{Value: gift.CreatedAt},
 		},
 	}
-	_, err := r.db.DeleteItem(context.Background(), params)
+	_, err = r.db.DeleteItem(context.Background(), params)
 	if err != nil {
 		return fmt.Errorf("Error when trying to delete gift: %w", err)
 	}
