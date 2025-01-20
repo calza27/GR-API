@@ -546,7 +546,7 @@ components:
           type: string
         created_at:
           type: string
-        name:
+        list_name:
           type: string
         sharing_id:
           type: string
