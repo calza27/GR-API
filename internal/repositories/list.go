@@ -199,11 +199,19 @@ func (r *DynamoDbListRepository) uniqueSharingId() (string, error) {
 	limit := 10
 	for {
 		sharingId := generateSharingId()
-		existingList, err := r.GetListById(sharingId)
-		if err != nil {
-			return "", err
+		params := &dynamodb.QueryInput{
+			TableName:              aws.String(r.tablename),
+			IndexName:              aws.String(r.sharingIdIndex),
+			KeyConditionExpression: aws.String("sharingId = :sharingId"),
+			ExpressionAttributeValues: map[string]types.AttributeValue{
+				":sharingId": &types.AttributeValueMemberS{Value: sharingId},
+			},
 		}
-		if existingList.Id == "" {
+		result, err := r.db.Query(context.Background(), params)
+		if err != nil {
+			return "", fmt.Errorf("Error when trying to validate potential sharing id: %w", err)
+		}
+		if len(result.Items) == 0 {
 			return sharingId, nil
 		}
 		limit -= 1
