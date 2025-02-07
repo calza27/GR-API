@@ -71,6 +71,10 @@ func (h *Handler) HandleRequest(ctx context.Context, request events.APIGatewayPr
 		handlerFunc = middleware.EnsureUserIdPresent(h.GiftHandler.HandleUpdateGift)
 	case "deleteGift":
 		handlerFunc = middleware.EnsureUserIdPresent(h.GiftHandler.HandleRemoveGift)
+	case "purchaseGift":
+		handlerFunc = h.GiftHandler.HandlePurchaseGift
+	case "unpurchaseGift":
+		handlerFunc = middleware.EnsureUserIdPresent(h.GiftHandler.HandleUnpurchaseGift)
 	default:
 		return utils.BuildResponse(fmt.Sprintf("unknown operation %s", operationName), 400, nil), nil
 	}

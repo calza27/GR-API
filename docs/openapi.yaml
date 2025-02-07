@@ -286,7 +286,7 @@ paths:
       parameters:
         - name: list_id
           in: path
-          description: the ID of the list the gift is assocaited with
+          description: the ID of the list the gift is associated with
           required: true
           schema:
             type: string
@@ -332,6 +332,73 @@ paths:
         - name: gift_id
           in: path
           description: the ID of the gift to delete
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: "Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      security:
+        - CognitoPool: []
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
+  /list/{list_id}/gift/{gift_id}/purchase:
+    post:
+      summary: Mark a gift as purchased
+      description: "Mark a gift as purchased"
+      operationId: purchaseGift
+      parameters:
+        - name: list_id
+          in: path
+          description: the ID of the list the gift is associated with
+          required: true
+          schema:
+            type: string
+        - name: gift_id
+          in: path
+          description: the ID of the gift to mark as purchased
+          required: true
+          schema:
+            type: string
+      responses:
+        "201":
+          description: "Success"
+        "404":
+          $ref: "#/components/responses/NotFound"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+      deprecated: false
+      security: []
+      x-amazon-apigateway-request-validator: "basic"
+      x-amazon-apigateway-integration:
+        httpMethod: "POST"
+        type: "aws_proxy"
+        uri:
+          Fn::Sub: "arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/{{resolve:ssm:/gift-registry/function/gift/arn}}:live/invocations"
+  /list/{list_id}/gift/{gift_id}/unpurchase:
+    post:
+      summary: Mark a gift as not purchased
+      description: "Mark a gift as not purchased"
+      operationId: unpurchaseGift
+      parameters:
+        - name: list_id
+          in: path
+          description: the ID of the list the gift is associated with
+          required: true
+          schema:
+            type: string
+        - name: gift_id
+          in: path
+          description: the ID of the gift to mark as not purchased
           required: true
           schema:
             type: string

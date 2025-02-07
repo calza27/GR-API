@@ -15,6 +15,8 @@ type GiftHandler interface {
 	HandleGetGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 	HandleUpdateGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 	HandleRemoveGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
+	HandlePurchaseGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
+	HandleUnpurchaseGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse
 }
 
 type GiftHandlerImpl struct {
@@ -148,6 +150,70 @@ func (h *GiftHandlerImpl) HandleRemoveGift(request events.APIGatewayProxyRequest
 	if err != nil {
 		fmt.Printf("Error removing gift: %w\n", err)
 		return utils.BuildResponse("Error removing gift", 500, nil)
+	}
+	return utils.BuildResponse("", 201, nil)
+}
+
+func (h *GiftHandlerImpl) HandlePurchaseGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	listId := request.PathParameters["list_id"]
+	if listId == "" {
+		return utils.BuildResponse("Missing required path parameter: list_id", 400, nil)
+	}
+	giftId := request.PathParameters["gift_id"]
+	if giftId == "" {
+		return utils.BuildResponse("Missing required path parameter: gift_id", 400, nil)
+	}
+
+	gift, err := h.GiftRepository.GetGiftById(giftId)
+	if err != nil {
+		fmt.Printf("Error getting gift for purchase: %w\n", err)
+		return utils.BuildResponse("Error purchasing gift", 500, nil)
+	}
+	if gift.Id == "" {
+		fmt.Printf("Gift not found: %w\n", err)
+		return utils.BuildResponse("Gift not found", 404, nil)
+	}
+	if gift.ListId != listId {
+		fmt.Printf("Gift.listId - list_id mismatch, %s != %s: %w\n", gift.ListId, listId, err)
+		return utils.BuildResponse("Gift not found", 404, nil)
+	}
+	gift.Purchased = true
+	err = h.GiftRepository.UpdateGift(gift)
+	if err != nil {
+		fmt.Printf("Error updating gift for purchase: %w\n", err)
+		return utils.BuildResponse("Error purchasing gift", 500, nil)
+	}
+	return utils.BuildResponse("", 201, nil)
+}
+
+func (h *GiftHandlerImpl) HandleUnpurchaseGift(request events.APIGatewayProxyRequest) events.APIGatewayProxyResponse {
+	listId := request.PathParameters["list_id"]
+	if listId == "" {
+		return utils.BuildResponse("Missing required path parameter: list_id", 400, nil)
+	}
+	giftId := request.PathParameters["gift_id"]
+	if giftId == "" {
+		return utils.BuildResponse("Missing required path parameter: gift_id", 400, nil)
+	}
+
+	gift, err := h.GiftRepository.GetGiftById(giftId)
+	if err != nil {
+		fmt.Printf("Error getting gift to mark unpurchased: %w\n", err)
+		return utils.BuildResponse("Error unpurchasing gift", 500, nil)
+	}
+	if gift.Id == "" {
+		fmt.Printf("Gift not found: %w\n", err)
+		return utils.BuildResponse("Gift not found", 404, nil)
+	}
+	if gift.ListId != listId {
+		fmt.Printf("Gift.listId - list_id mismatch, %s != %s: %w\n", gift.ListId, listId, err)
+		return utils.BuildResponse("Gift not found", 404, nil)
+	}
+	gift.Purchased = false
+	err = h.GiftRepository.UpdateGift(gift)
+	if err != nil {
+		fmt.Printf("Error updating gift to mark unpurchase: %w\n", err)
+		return utils.BuildResponse("Error unpurchasing gift", 500, nil)
 	}
 	return utils.BuildResponse("", 201, nil)
 }
