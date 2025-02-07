@@ -11,4 +11,5 @@ type Gift struct {
 	Url             string `json:"url"`
 	Price           int    `json:"price"`
 	Rank            int    `json:"rank"`
+	Purchased       bool   `json:"purchased"`
 }

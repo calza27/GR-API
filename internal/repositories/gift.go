@@ -53,6 +53,7 @@ type GiftEntity struct {
 	Url             string `dynamodbav:"url,omitempty"`
 	Price           int    `dynamodbav:"price,omitempty"`
 	Rank            int    `dynamodbav:"rank,omitempty"`
+	Purchased       bool   `dynamodbav:"purchased"`
 }
 
 func (r *DynamoDbGiftRepository) CreateGift(gift models.Gift) error {
@@ -160,8 +161,7 @@ func (r *DynamoDbGiftRepository) DeleteGift(giftId string) error {
 }
 
 func convertToGiftModel(gift models.Gift) GiftEntity {
-
-	giftItem := GiftEntity{
+	return GiftEntity{
 		Id:              gift.Id,
 		ListId:          gift.ListId,
 		CreatedAt:       gift.CreatedAt,
@@ -172,8 +172,8 @@ func convertToGiftModel(gift models.Gift) GiftEntity {
 		Url:             gift.Url,
 		Price:           gift.Price,
 		Rank:            gift.Rank,
+		Purchased:       gift.Purchased,
 	}
-	return giftItem
 }
 
 func convertToGift(gift GiftEntity) models.Gift {
@@ -188,5 +188,6 @@ func convertToGift(gift GiftEntity) models.Gift {
 		Url:             gift.Url,
 		Price:           gift.Price,
 		Rank:            gift.Rank,
+		Purchased:       gift.Purchased,
 	}
 }
