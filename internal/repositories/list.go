@@ -49,6 +49,7 @@ type ListEntity struct {
 	UserId        string `dynamodbav:"userId"`
 	CreatedAt     string `dynamodbav:"createdAt"`
 	ListName      string `dynamodbav:"listName,omitempty"`
+	Description   string `dynamodbav:"description,omitempty"`
 	SharingId     string `dynamodbav:"sharingId,omitempty"`
 	ImageFileName string `dynamodbav:"imageFileName,omitempty"`
 }
@@ -186,6 +187,7 @@ func convertToListModel(list models.List) ListEntity {
 		UserId:        list.UserId,
 		CreatedAt:     list.CreatedAt,
 		ListName:      list.ListName,
+		Description:   list.Description,
 		SharingId:     list.SharingId,
 		ImageFileName: list.ImageFileName,
 	}
@@ -198,6 +200,7 @@ func convertToList(list ListEntity) models.List {
 		UserId:        list.UserId,
 		CreatedAt:     list.CreatedAt,
 		ListName:      list.ListName,
+		Description:   list.Description,
 		SharingId:     list.SharingId,
 		ImageFileName: list.ImageFileName,
 	}

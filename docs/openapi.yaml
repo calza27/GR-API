@@ -615,6 +615,8 @@ components:
           type: string
         list_name:
           type: string
+        description:
+          type: string
         sharing_id:
           type: string
         image_file_name:
